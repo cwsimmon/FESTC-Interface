@@ -408,7 +408,7 @@ public class CreateAppManFilesPanel extends UtilFieldsPanel implements PlotEvent
 		sb.append("# Written by: Fortran by Benson, Original Script by IE. 2012" + ls);
 		sb.append("# Modified by: EMVL " + ls); 
 		sb.append("#" + ls);
-		sb.append("# Program: ManGenFERT.exe" + ls);        
+		sb.append("# Program: ManGenFERT.exe or ManGenFERT2011.exe" + ls);        
 		sb.append("# " + ls);
 		sb.append("#***************************************************************************************" + ls + ls);
 		
@@ -438,7 +438,11 @@ public class CreateAppManFilesPanel extends UtilFieldsPanel implements PlotEvent
 		sb.append("#" + ls);
 		sb.append("echo ==== Begin EPIC management app run of CROP $CROP_NAME" + ls);
 		sb.append("#" + ls);
-		sb.append("time $EXEC_DIR/ManGenFERT.exe" + ls);
+		if (fYear.contains("2011")) {
+			sb.append("time $EXEC_DIR/ManGenFERT2011.exe " + ls );
+		} else {
+			sb.append("time $EXEC_DIR/ManGenFERT.exe" + ls);
+		}
 		sb.append("if ( $status == 0 ) then" + ls);
 		sb.append("  echo  ==== Finished EPIC management app run of CROP: $CROP_NAME" + ls);
 		sb.append("else" + ls);

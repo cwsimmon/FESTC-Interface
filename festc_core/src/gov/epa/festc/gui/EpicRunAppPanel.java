@@ -282,7 +282,8 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		} else {
 			//assume batch system that supports job arrays (SLURM, PBS, LSF, etc)			
 			//create job array script
-			scriptContent = createArrayTaskScript(baseDir, scenarioDir, simY, simEndY, simNY, ndepValue);
+			scriptContent = createArrayTaskScript(baseDir, scenarioDir, simY, simEndY, simNY, ndepValue,
+					cropNames, cropIDs);
 		}
 		
 		// create submit script
@@ -382,7 +383,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 	}
 	
 	private String createArrayTaskScript(String baseDir, String scenarioDir, String simY, String simEndY, String simNY,
-			String ndepValue){
+			String ndepValue, String cropNames, String cropIDs){
 		
 		String qcmd = Constants.getProperty(Constants.QUEUE_CMD, msg).toLowerCase();
 		String arrayIdEnvVar = "";
@@ -434,11 +435,13 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		
 		sb.append("# Set output dir" + ls);
 		sb.append("setenv EPIC_CMAQ_OUTPUT $SCEN_DIR/output4CMAQ/$type" + ls);
-		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT  ) mkdir -p $EPIC_CMAQ_OUTPUT" + ls);
-		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/year  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/year" + ls);
-		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/daily  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/daily" + ls);
-		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/toCMAQ  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/toCMAQ" + ls);
-		sb.append("@ SYEAR++" + ls);
+		sb.append("set SYEAR = $SIM_SYEAR" + ls);
+		sb.append("while ($SYEAR <= $SIM_EYEAR)" + ls);
+		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT  ) mkdir -p $EPIC_CMAQ_OUTPUT" + ls);
+		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/year  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/year" + ls);
+		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/daily  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/daily" + ls);
+		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT/$SYEAR/toCMAQ  ) mkdir -p $EPIC_CMAQ_OUTPUT/$SYEAR/toCMAQ" + ls);
+		sb.append("  @ SYEAR++" + ls);
 		sb.append("end" + ls);
 		
 		
@@ -538,7 +541,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		
 		sb.append("" + ls);
 //		sb.append("set    EXEC_DIR = " + baseDir + "/model/current" + ls);
-		sb.append("set    DAILYWETH $SHARE_DIR/dailyWETH" + ls);
+//		sb.append("set    DAILYWETH $SHARE_DIR/dailyWETH" + ls);
 		sb.append("set    EXEC_DIR = " + baseDir + "/model/current_multiYears" + ls);
 		sb.append("" + ls);
 
