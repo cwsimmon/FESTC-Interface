@@ -499,7 +499,7 @@ public class EpicSpinupPanel  extends UtilFieldsPanel implements PlotEventListen
 		sb.append("setenv    SHARE_DIR $SCEN_DIR/share_data" + ls);
 		 
 		sb.append("" + ls);
-		sb.append("set    EXEC_DIR = " + baseDir + "/model/current" + ls);
+		sb.append("set    EXEC_DIR = " + baseDir + "/model/current_multiYears" + ls);
 		sb.append("" + ls);
 
 

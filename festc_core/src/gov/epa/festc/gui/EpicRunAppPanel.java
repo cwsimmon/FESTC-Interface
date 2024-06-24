@@ -435,6 +435,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		
 		sb.append("# Set output dir" + ls);
 		sb.append("setenv EPIC_CMAQ_OUTPUT $SCEN_DIR/output4CMAQ/$type" + ls);
+		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT/daily  ) mkdir -p $EPIC_CMAQ_OUTPUT/daily" + ls);
 		sb.append("set SYEAR = $SIM_SYEAR" + ls);
 		sb.append("while ($SYEAR <= $SIM_EYEAR)" + ls);
 		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT  ) mkdir -p $EPIC_CMAQ_OUTPUT" + ls);
@@ -562,6 +563,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		sb.append("#" + ls + ls);
 		
 		sb.append("setenv EPIC_CMAQ_OUTPUT  $SCEN_DIR/output4CMAQ/$type" + ls);
+		sb.append("if ( ! -e $EPIC_CMAQ_OUTPUT/daily  ) mkdir -p $EPIC_CMAQ_OUTPUT/daily" + ls);
 		sb.append("set SYEAR = $SIM_SYEAR" + ls);
 		sb.append("while ($SYEAR <= $SIM_EYEAR)" + ls);
 		sb.append("  if ( ! -e $EPIC_CMAQ_OUTPUT  ) mkdir -p $EPIC_CMAQ_OUTPUT" + ls);
