@@ -51,6 +51,7 @@ public class EpicSpinupPanel  extends UtilFieldsPanel implements PlotEventListen
 	
 	private JComboBox nDepSel;
 	private JComboBox runTiledrain;
+	private JComboBox outputFormat;
 	private JTextField co2Factor;
  
 	public EpicSpinupPanel(FestcApplication application) {
@@ -107,12 +108,16 @@ public class EpicSpinupPanel  extends UtilFieldsPanel implements PlotEventListen
 		 
 		runTiledrain = new JComboBox(new String[] {"YES", "NO"});
 		runTiledrain.setSelectedIndex(1);
+		
+		outputFormat = new JComboBox(new String[] {"Text & NetCDF", "NetCDF only", "Text only"});
+		outputFormat.setSelectedIndex(2);
 
 		layout.addLabelWidgetPair(Constants.LABEL_EPIC_SCENARIO, scenarioDir, panel);	 
 		layout.addLabelWidgetPair("CO2 Level (ppm): ", co2Factor, panel);
 		layout.addLabelWidgetPair("Daily Average N Deposition: ", nDepSel, panel);
 		layout.addLabelWidgetPair("Run Tiledrain : ", runTiledrain, panel);
-		layout.makeCompactGrid(panel, 4, 2, // number of rows and cols
+		layout.addLabelWidgetPair("Output Format : ", outputFormat, panel);
+		layout.makeCompactGrid(panel, 5, 2, // number of rows and cols
 				10, 10, // initial X and Y
 				5, 5); // x and y pading
 
@@ -473,6 +478,7 @@ public class EpicSpinupPanel  extends UtilFieldsPanel implements PlotEventListen
 		sb.append("setenv    WEAT_DIR $COMM_DIR/statWeath" + ls);
 		sb.append("setenv    CO2_FAC  " + co2Factor.getText() + ls);	 
 		sb.append("setenv    RUN_TD   " +  (String)runTiledrain.getSelectedItem()  + ls);
+		sb.append("setenv    DAILY_OUT   " +  outputFormat.getSelectedIndex()  + ls);
 		
 		//ndepValue = "RFN0";
 		String ndepFile = "";

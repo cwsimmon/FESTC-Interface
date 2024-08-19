@@ -53,6 +53,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 	
 	private JComboBox nDepSel;
 	private JComboBox runTiledrain;
+	private JComboBox outputFormat;
 	private JTextField co2Factor;
 
 	public EpicRunAppPanel(FestcApplication application) {
@@ -111,6 +112,9 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		
 		runTiledrain = new JComboBox(new String[] {"YES", "NO"});
 		runTiledrain.setSelectedIndex(1);
+		
+		outputFormat = new JComboBox(new String[] {"Text & NetCDF", "NetCDF only", "Text only"});
+		outputFormat.setSelectedIndex(2);
 
 		this.simYear = new JTextField(20);
 		this.simEndYear = new JTextField(20);
@@ -120,8 +124,9 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		layout.addLabelWidgetPair("CO2 Level (ppm):",co2Factor, panel);
 		layout.addLabelWidgetPair("Daily Average N Deposition: ", nDepSel, panel);
 		layout.addLabelWidgetPair("Run Tiledrain : ", runTiledrain, panel);
+		layout.addLabelWidgetPair("Output Format : ", outputFormat, panel);
 		 
-		layout.makeCompactGrid(panel, 6,2, // number of rows and cols
+		layout.makeCompactGrid(panel, 7,2, // number of rows and cols
 				10, 10, // initial X and Y
 				5, 5); // x and y pading
 
@@ -516,6 +521,7 @@ public class EpicRunAppPanel extends UtilFieldsPanel implements PlotEventListene
 		sb.append("setenv    COMM_DIR  $EPIC_DIR/common_data" +ls);
 		sb.append("setenv    CO2_FAC  " + co2Factor.getText() + ls);
 		sb.append("setenv    RUN_TD   " +  (String)runTiledrain.getSelectedItem()  + ls);
+		sb.append("setenv    DAILY_OUT   " +  outputFormat.getSelectedIndex()  + ls);
 		 
 		//ndepValue = "RFN0";
 		String ndepFile = "";
