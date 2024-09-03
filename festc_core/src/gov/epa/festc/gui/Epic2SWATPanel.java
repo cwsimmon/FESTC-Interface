@@ -417,6 +417,9 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("#" + ls);
 		sb.append("# Set up runtime environment" + ls);
 		sb.append("#" + ls);
+		
+		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
+		sb.append("module load " + rModules + ls);
 
 		sb.append("setenv    EPIC_DIR  " + baseDir + ls);
 		sb.append("setenv    SCEN_DIR  " + scenarioDir + ls);
@@ -426,28 +429,36 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("# Get site infomation" + ls);
 		sb.append("setenv    SITE_FILE   ${SHARE_DIR}/EPICSites_Info.csv" + ls + ls);
 		sb.append("# Define BELD4 input file, get crop fractions " + ls);
-		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls + ls);
+		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls);
+		sb.append("setenv REGION " + hucSel.getSelectedItem() + ls + ls);
+
+		sb.append("# Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" + ls);
+		sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+		sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+		sb.append("    setenv SIM_YEAR $MULTI_YEAR" + ls + ls);
 
 		sb.append("# EPIC input location" + ls);
-		sb.append("setenv DAY_DIR   $SCEN_DIR/output4CMAQ/app/daily" + ls + ls);
-		sb.append("# SWAT output location" + ls);
-		sb.append("setenv OUTDIR   $SCEN_DIR/output4SWAT/dailyEPIC" + ls);
-		sb.append("if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
-		sb.append("if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
-		sb.append("if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
+		sb.append("    setenv DAY_DIR   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/daily" + ls + ls);
+		//sb.append("# SWAT output location" + ls);
+		sb.append("    setenv OUTDIR   $SCEN_DIR/output4SWAT/${MULTI_YEAR}/dailyEPIC" + ls);
+		sb.append("    if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
+		sb.append("    if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
+		sb.append("    if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
 
 		// sb.append("setenv OUTFILE_PREFIX $OUTDIR/" + filesPrefix.getText() +
 		// ls + ls);
-		sb.append("setenv REGION " + hucSel.getSelectedItem() + ls + ls);
+		
 
 		// sb.append("cd $EPIC_DIR/util/swat/" + ls );
-		sb.append("echo 'Run EPIC daily summary for swat: ' " + scenarioDir + ls);
+		sb.append("    echo 'Run EPIC daily summary for swat: ' $MULTI_YEAR_DIR" + ls);
 
-		sb.append("R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_dailyEPIC.R "
-				+ "${SCEN_DIR}/scripts/epic2swat_extract_dailyEPIC.log" + ls + ls);
+		sb.append("    R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_dailyEPIC.R "
+				+ "${SCEN_DIR}/scripts/epic2swat_extract_dailyEPIC_${MULTI_YEAR}.log" + ls);
+		sb.append("end" + ls + ls);
 
 		String mesg = "";
 		try {
@@ -501,6 +512,9 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("#" + ls);
 		sb.append("# Set up runtime environment" + ls);
 		sb.append("#" + ls);
+		
+		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
+		sb.append("module load " + rModules + ls);
 
 		sb.append("setenv    EPIC_DIR  " + baseDir + ls);
 		sb.append("setenv    SCEN_DIR  " + scenarioDir + ls);
@@ -510,26 +524,33 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 
 		sb.append("# Define BELD4 input file" + ls);
 		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls + ls);
+		
 		sb.append("# Location of deposition files " + ls);
-
 		sb.append("setenv    NDEP_TYPE " + ndepType + ls);
 		sb.append("setenv    NDEP_FILE     " + metdepFile.getText() + ls);
+		
+		sb.append("# Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" + ls);
+		sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+		sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+		sb.append("    setenv SIM_YEAR $MULTI_YEAR" + ls + ls);
 
 		sb.append("# output location" + ls);
-		sb.append("setenv OUTDIR   $SCEN_DIR/output4SWAT/NDEP/" + ndepType + ls);
-		sb.append("if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
-		sb.append("if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
-		sb.append("if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
-		sb.append("if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
+		sb.append("    setenv OUTDIR   $SCEN_DIR/output4SWAT/${MULTI_YEAR}/NDEP/" + ndepType + ls);
+		sb.append("    if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
+		sb.append("    if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
+		sb.append("    if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
+		sb.append("    if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
 
 		// sb.append("setenv REGION " + hucSel.getSelectedItem() + ls);
 		// sb.append("cd $EPIC_DIR/util/swat/" + ls );
-		sb.append("echo 'Extract daily depositon from yearly CMAQ or 2004/2008 averaged ndep: '" + scenarioDir + ls);
-		sb.append("R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_daily_ndepCMAQ.R "
-				+ "${SCEN_DIR}/scripts/epic2swat_extract_daily_ndepCMAQ.log" + ls + ls);
+		sb.append("    echo 'Extract daily depositon from yearly CMAQ or 2004/2008 averaged ndep: ' $MULTI_YEAR_DIR" + ls);
+		sb.append("    R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_daily_ndepCMAQ.R "
+				+ "${SCEN_DIR}/scripts/epic2swat_extract_daily_ndepCMAQ_${MULTI_YEAR}.log" + ls);
+		sb.append("end" + ls + ls);
 
 		String mesg = "";
 		try {
@@ -586,6 +607,9 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("#" + ls);
 		sb.append("# Set up runtime environment" + ls);
 		sb.append("#" + ls);
+		
+		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
+		sb.append("module load " + rModules + ls);
 
 		sb.append("setenv    EPIC_DIR   " + baseDir + ls);
 		sb.append("setenv    SCEN_DIR   " + scenarioDir + ls);
@@ -600,19 +624,26 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("setenv    SITE_FILE   ${SHARE_DIR}/AllSites_Info.csv" + ls + ls);
 		sb.append("# Define ratio input file" + ls);
 		sb.append("setenv    RATIO_FILE  " + ratioF + ls + ls);
+		
+		sb.append("# Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" + ls);
+		sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+		sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+		sb.append("    setenv SIM_YEAR $MULTI_YEAR" + ls + ls);
 
 		sb.append("# output location" + ls);
-		sb.append("setenv OUTDIR   $SCEN_DIR/output4SWAT" + ls);
-		sb.append("setenv SWAT_OUTDIR   $SCEN_DIR/output4SWAT/swat_inputs" + ls);
-		sb.append("if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
-		sb.append("if ( ! -e $SWAT_OUTDIR ) mkdir -p $SWAT_OUTDIR" + ls);
-		sb.append("if ( ! -e $SWAT_OUTDIR/dailydep ) mkdir -p $SWAT_OUTDIR/dailydep" + ls);
-		sb.append("if ( ! -e $SWAT_OUTDIR/dailyweath ) mkdir -p $SWAT_OUTDIR/dailyweath" + ls);
-		sb.append("if ( ! -e $SWAT_OUTDIR/EPICinputPoint ) mkdir -p $SWAT_OUTDIR/EPICinputPoint" + ls);
+		sb.append("    setenv OUTDIR   $SCEN_DIR/output4SWAT/$MULTI_YEAR" + ls);
+		sb.append("    setenv SWAT_OUTDIR   $SCEN_DIR/output4SWAT/${MULTI_YEAR}/swat_inputs" + ls);
+		sb.append("    if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
+		sb.append("    if ( ! -e $SWAT_OUTDIR ) mkdir -p $SWAT_OUTDIR" + ls);
+		sb.append("    if ( ! -e $SWAT_OUTDIR/dailydep ) mkdir -p $SWAT_OUTDIR/dailydep" + ls);
+		sb.append("    if ( ! -e $SWAT_OUTDIR/dailyweath ) mkdir -p $SWAT_OUTDIR/dailyweath" + ls);
+		sb.append("    if ( ! -e $SWAT_OUTDIR/EPICinputPoint ) mkdir -p $SWAT_OUTDIR/EPICinputPoint" + ls);
 
-		sb.append("echo  'Extract swat inputs:  ' $SCEN_DIR" + ls);
-		sb.append("R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/extract_swatInputs.R "
-				+ "${SCEN_DIR}/scripts/extract_swatInputs_" + ndepType + ".log" + ls + ls);
+		sb.append("    echo  'Extract swat inputs:  ' $MULTI_YEAR_DIR" + ls);
+		sb.append("    R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/extract_swatInputs.R "
+				+ "${SCEN_DIR}/scripts/extract_swatInputs_" + ndepType + "_${MULTI_YEAR}.log" + ls);
+		sb.append("end" + ls + ls);
 
 		String mesg = "";
 		try {
@@ -665,6 +696,9 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("#" + ls);
 		sb.append("# Set up runtime environment" + ls);
 		sb.append("#" + ls);
+		
+		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
+		sb.append("module load " + rModules + ls);
 
 		sb.append("setenv    EPIC_DIR  " + baseDir + ls);
 		sb.append("setenv    SCEN_DIR  " + scenarioDir + ls);
@@ -677,22 +711,29 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("# met yearly file location" + ls);
 		sb.append("setenv    NDEP_TYPE " + ndepType + ls);
 		sb.append("setenv    DEPMET_FILE  " + metdepFile.getText() + ls + ls);
+		sb.append("setenv REGION " + hucSel.getSelectedItem() + ls + ls);
+		
+		sb.append("# Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" + ls);
+		sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+		sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+		sb.append("    setenv SIM_YEAR $MULTI_YEAR" + ls + ls);
 
 		sb.append("# output location" + ls);
-		sb.append("setenv OUTDIR   $SCEN_DIR/output4SWAT/dailyWETH/" + ndepType + ls);
-		sb.append("if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
-		sb.append("if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
-		sb.append("if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
-		sb.append("if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
-		sb.append("if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
+		sb.append("    setenv OUTDIR   $SCEN_DIR/output4SWAT/${MULTI_YEAR}/dailyWETH/" + ndepType + ls);
+		sb.append("    if ( ! -e $OUTDIR) mkdir -p $OUTDIR" + ls);
+		sb.append("    if ( ! -e $OUTDIR/county ) mkdir -p $OUTDIR/county" + ls);
+		sb.append("    if ( ! -e $OUTDIR/state ) mkdir -p $OUTDIR/state" + ls);
+		sb.append("    if ( ! -e $OUTDIR/domain ) mkdir -p $OUTDIR/domain" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC8 ) mkdir -p $OUTDIR/HUC8" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC6 ) mkdir -p $OUTDIR/HUC6" + ls);
+		sb.append("    if ( ! -e $OUTDIR/HUC2 ) mkdir -p $OUTDIR/HUC2" + ls + ls);
 
-		sb.append("setenv REGION " + hucSel.getSelectedItem() + ls + ls);
 		// sb.append("cd $EPIC_DIR/util/swat/" + ls );
-		sb.append("echo 'Extract daily met/dep for SWAT from ' " + scenarioDir + ls);
-		sb.append("R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_daily_metCMAQ.R "
-				+ "${SCEN_DIR}/scripts/epic2swat_extract_daily_metCMAQ.log" + ls + ls);
+		sb.append("    echo 'Extract daily met/dep for SWAT from ' $MULTI_YEAR_DIR" + ls);
+		sb.append("    R CMD BATCH --no-save --slave " + "$EPIC_DIR/util/swat/epic2swat_extract_daily_metCMAQ.R "
+				+ "${SCEN_DIR}/scripts/epic2swat_extract_daily_metCMAQ_${MULTI_YEAR}.log" + ls + ls);
+		sb.append("end" + ls + ls);
 
 		String mesg = "";
 		try {
@@ -715,7 +756,7 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 	private String getEpicScriptHeader() {
 		StringBuilder sb = new StringBuilder();
 		String ls = "\n";
-		sb.append("#!/bin/csh -f" + ls);
+		sb.append("#!/bin/csh" + ls);
 		sb.append("#**************************************************************************************" + ls);
 		sb.append("# Purpose:   Prepare runoff inputs for SWAT by extracting " + ls);
 		sb.append("#           EPIC daily output files  output4CMAQ/app/daily/*NCD " + ls);
@@ -734,9 +775,9 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 	private String getNdepScriptHeader() {
 		StringBuilder sb = new StringBuilder();
 		String ls = "\n";
-		sb.append("#!/bin/csh -f" + ls);
+		sb.append("#!/bin/csh" + ls);
 		sb.append("#**************************************************************************************" + ls);
-		sb.append("# Purpose:   repare N Deposition inputs for SWAT by summarizing met data,  " + ls);
+		sb.append("# Purpose:   Prepare N Deposition inputs for SWAT by summarizing met data,  " + ls);
 		sb.append("#           netcdf weather data under ${SHAREDIR}/ " + ls);
 		sb.append("#           $COMMON_data/EPIC_model/dailyNDep_200? " + ls);
 		sb.append("#" + ls);
@@ -754,7 +795,7 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 	private String getWeatScriptHeader() {
 		StringBuilder sb = new StringBuilder();
 		String ls = "\n";
-		sb.append("#!/bin/csh -f" + ls);
+		sb.append("#!/bin/csh" + ls);
 		sb.append("#**************************************************************************************" + ls);
 		sb.append("# Purpose:   Prepare N Deposition and weather inputs for SWAT by summarizing  " + ls);
 		sb.append("#           netcdf weather data under ${SHAREDIR}/ " + ls);
@@ -774,7 +815,7 @@ public class Epic2SWATPanel extends UtilFieldsPanel implements PlotEventListener
 	private String getSWATScriptHeader() {
 		StringBuilder sb = new StringBuilder();
 		String ls = "\n";
-		sb.append("#!/bin/csh -f" + ls);
+		sb.append("#!/bin/csh" + ls);
 		sb.append("#**************************************************************************************" + ls);
 		sb.append("# Purpose:   Prepare swat inputs: dailyEPIC, NDEP, and weather" + ls);
 		sb.append("#" + ls);
