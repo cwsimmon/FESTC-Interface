@@ -261,8 +261,8 @@ public class Epic2CMAQPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append(getScirptHeader() + ls);
 		sb.append("#" + ls + "# Set up runtime environment" + ls + "#" + ls);
 		
-		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
-		sb.append("module load " + rModules + ls);
+//		String rModules = Constants.getProperty(Constants.QUEUE_R_MODULE, msg);
+//		sb.append("module load " + rModules + ls);
 		
 		sb.append("source " + sahome.trim() + Constants.SA_SETUP_FILE + ls + ls);
 		sb.append("setenv    SCEN_DIR " + scenario + ls);
@@ -277,39 +277,45 @@ public class Epic2CMAQPanel extends UtilFieldsPanel implements PlotEventListener
 		sb.append("setenv GRID_YCELLSIZE " + ((Number) ySize.getValue()).doubleValue() + ls + ls);
 		sb.append("setenv GRID_NAME  \"" + (gridName.getText() == null ? "" : gridName.getText().trim()) + "\"" + ls
 				+ ls);
-		sb.append("#" + ls + "#set EPIC output file directory which containts each day data:" + ls + "#" + ls);
-		if (spinup)
+		
+		if (!spinup) {
+		sb.append("#Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" + ls);
+		}
+		
+		
+		if (spinup) {
+			sb.append("#" + ls + "#set EPIC output file directory which contains each day data:" + ls + "#" + ls);
 			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/spinup/daily/" + ls + ls);
-		else
-			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/daily/" + ls + ls);
-
-		// sb.append("setenv DATA_DIR $SCEN_DIR/output4CMAQ/app/daily" + ls +
-		// ls);
-		sb.append("#" + ls + "#Set date and time range: YYYYMMDDHHMM" + ls + "#" + ls);
-		sb.append("setenv START_DATE  " + startDate.getText() + ls);
-		sb.append("setenv END_DATE    " + endDate.getText() + ls + ls);
-		// sb.append("#" + ls + "# Output files: three output files for soil,
-		// EPIC daily output, and fertilizer application data" + ls + "#" + ls);
-		// sb.append("setenv SOIL_OUTPUT_NETCDF_FILE \"" +
-		// outDir.getText().trim() + "/" + filesPrefix.getText().trim() +
-		// "_soil.nc\"" + ls);
-		// sb.append("setenv DAILY_OUTPUT_NETCDF_FILE \"" +
-		// outDir.getText().trim() + "/" + filesPrefix.getText().trim() +
-		// "_time\"" + ls + ls);
-		// sb.append("setenv FERTILIZER_OUTPUT_NETCDF_FILE \"" +
-		// outDir.getText().trim() + "/" + filesPrefix.getText().trim() +
-		// "_fert.nc\"" + ls + ls);
-		sb.append("#" + ls + "# Output file prefix for soil and EPIC daily output" + ls
-				+ "# \"prefix\"_soil.nc for soil ouput and \"prefix\"_time\"yyyymm\".nc for daily EPIC output" + ls
-				+ "#" + ls);
-		if (spinup)
+			sb.append("#" + ls + "#Set date and time range: YYYYMMDDHHMM" + ls + "#" + ls);
+			sb.append("setenv START_DATE  " + startDate.getText() + ls);
+			sb.append("setenv END_DATE    " + endDate.getText() + ls + ls);
+			sb.append("#" + ls + "# Output file prefix for soil and EPIC daily output" + ls
+					+ "# \"prefix\"_soil.nc for soil ouput and \"prefix\"_time\"yyyymm\".nc for daily EPIC output" + ls
+					+ "#" + ls);
 			sb.append("setenv OUTPUT_NETCDF_FILE_PREFIX   $SCEN_DIR/output4CMAQ/spinup/toCMAQ/"
 					+ filesPrefix.getText().trim() + ls);
-		else
-			sb.append("setenv OUTPUT_NETCDF_FILE_PREFIX   $SCEN_DIR/output4CMAQ/app/toCMAQ/"
+			sb.append("#" + ls + "# run the EPIC output processing program" + ls + "#" + ls);
+			sb.append("$SA_HOME/bin/64bits/extractEPIC2CMAQ.exe" + ls + ls);
+		} else {
+			sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+			sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+			sb.append("    #" + ls + "    #set EPIC output file directory which contains each day data:" + ls + "    #" + ls);	
+			sb.append("    setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/daily/" + ls + ls);
+			sb.append("    #" + ls + "    #Set date and time range: YYYYMMDDHHMM" + ls + "    #" + ls);
+//			sb.append("    setenv START_DATE  ${MULTI_YEAR}" + startDate.getText() + ls);
+//			sb.append("    setenv END_DATE    ${MULTI_YEAR}" + endDate.getText() + ls + ls);
+			sb.append("    setenv START_DATE  ${MULTI_YEAR}\"0101\"" + ls);
+			sb.append("    setenv END_DATE    ${MULTI_YEAR}\"1231\"" + ls);
+			sb.append("    #" + ls + "    # Output file prefix for soil and EPIC daily output" + ls
+					+ "    # \"prefix\"_soil.nc for soil ouput and \"prefix\"_time\"yyyymm\".nc for daily EPIC output" + ls
+					+ "    #" + ls);
+			sb.append("    setenv OUTPUT_NETCDF_FILE_PREFIX   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/toCMAQ/"
 					+ filesPrefix.getText().trim() + ls);
-		sb.append("#" + ls + "# run the EPIC output processing program" + ls + "#" + ls);
-		sb.append("$SA_HOME/bin/64bits/extractEPIC2CMAQ.exe" + ls + ls);
+			sb.append("    #" + ls + "    # run the EPIC output processing program" + ls + "    #" + ls);
+			sb.append("    $SA_HOME/bin/64bits/extractEPIC2CMAQ.exe" + ls + "end" + ls + ls);
+		}
+	
 		sb.append("if ( $status == 0 ) then" + ls);
 		sb.append("    echo ==== Finished EPIC to CMAQ run. " + ls);
 		sb.append("else " + ls);

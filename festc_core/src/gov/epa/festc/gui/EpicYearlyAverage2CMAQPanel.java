@@ -290,23 +290,35 @@ public class EpicYearlyAverage2CMAQPanel extends UtilFieldsPanel implements Plot
 
 		sb.append("# Define BELD4 input file" + ls);
 		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls + ls);
-
-		sb.append("#" + ls + "# Output file:" + ls + "#" + ls);
+		
+		sb.append("# Process multiple years" + ls);
+		sb.append("set SIM_YEAR=\"$SCEN_DIR/output4CMAQ/app/[1-2][0-9][0-9][0-9]\"" +ls);
+		sb.append("foreach MULTI_YEAR_DIR ($SIM_YEAR)" + ls);
+		sb.append("    set MULTI_YEAR=`basename $MULTI_YEAR_DIR`" + ls);
+		sb.append("    setenv SIM_YEAR $MULTI_YEAR" + ls);
+		sb.append("    #" + ls + "    # set EPIC output file directory which containts each day data" + ls + "    #" + ls);
 		if (spinup)
-			sb.append("setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year.nc" + ls + ls);
+			sb.append("    setenv DATA_DIR   $SCEN_DIR/output4CMAQ/spinup/${MULTI_YEAR}/year/" + ls);
+		else 
+			sb.append("    setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/year/" + ls + ls);
+
+		sb.append("    #" + ls + "    # Output file:" + ls + "    #" + ls);
+		if (spinup)
+			sb.append("    setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year.nc" + ls + ls);
 		else
-			sb.append("setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year.nc" + ls + ls);
+			sb.append("    setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year.nc" + ls + ls);
 
-		sb.append("#Total from all crops" + ls);
+		sb.append("    #Total from all crops" + ls);
 		if (spinup)
-			sb.append("setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year_total.nc"
+			sb.append("    setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year_total.nc"
 					+ ls + ls);
 		else
-			sb.append("setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year_total.nc"
+			sb.append("    setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year_total.nc"
 					+ ls + ls);
 
-		sb.append("#" + ls + "# run the EPIC output processing program:" + ls + "#" + ls);
-		sb.append("$SA_HOME/bin/64bits/extractEPICYearlyAverage2CMAQ.exe" + ls + ls);
+		sb.append("    #" + ls + "    # run the EPIC output processing program:" + ls + "    #" + ls);
+		sb.append("    $SA_HOME/bin/64bits/extractEPICYearlyAverage2CMAQ.exe" + ls);
+		sb.append("end"+ls);
 
 		// Boolean swatDayYN = swatDayBox.isSelected()? true : false;
 		// System.out.println(swatDayYN);
