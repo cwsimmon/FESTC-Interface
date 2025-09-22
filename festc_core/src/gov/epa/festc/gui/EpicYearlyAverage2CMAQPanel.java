@@ -286,7 +286,7 @@ public class EpicYearlyAverage2CMAQPanel extends UtilFieldsPanel implements Plot
 		if (spinup)
 			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/spinup/5years/" + ls + ls);
 		else
-			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/year/" + ls + ls);
+			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/year/" + ls + ls);
 
 		sb.append("# Define BELD4 input file" + ls);
 		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls + ls);
@@ -306,14 +306,14 @@ public class EpicYearlyAverage2CMAQPanel extends UtilFieldsPanel implements Plot
 		if (spinup)
 			sb.append("    setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year.nc" + ls + ls);
 		else
-			sb.append("    setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year.nc" + ls + ls);
+			sb.append("    setenv OUTPUT_NETCDF_FILE   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/toCMAQ/epic2cmaq_year.nc" + ls + ls);
 
 		sb.append("    #Total from all crops" + ls);
 		if (spinup)
 			sb.append("    setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/spinup/toCMAQ/epic2cmaq_year_total.nc"
 					+ ls + ls);
 		else
-			sb.append("    setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/app/toCMAQ/epic2cmaq_year_total.nc"
+			sb.append("    setenv OUTPUT_NETCDF_FILE_TOTAL " + "$SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/toCMAQ/epic2cmaq_year_total.nc"
 					+ ls + ls);
 
 		sb.append("    #" + ls + "    # run the EPIC output processing program:" + ls + "    #" + ls);
