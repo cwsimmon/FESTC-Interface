@@ -281,12 +281,6 @@ public class EpicYearlyAverage2CMAQPanel extends UtilFieldsPanel implements Plot
 		sb.append("setenv GRID_YCELLSIZE " + ((Number) ySize.getValue()).doubleValue() + ls + ls);
 		sb.append("setenv GRID_NAME  \"" + (gridName.getText() == null ? "" : gridName.getText().trim()) + "\"" + ls
 				+ ls);
-		sb.append("#" + ls + "# set EPIC output file directory which containts each day data" + ls + "#" + ls);
-
-		if (spinup)
-			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/spinup/5years/" + ls + ls);
-		else
-			sb.append("setenv DATA_DIR   $SCEN_DIR/output4CMAQ/app/${MULTI_YEAR}/year/" + ls + ls);
 
 		sb.append("# Define BELD4 input file" + ls);
 		sb.append("setenv DOMAIN_BELD4_NETCDF " + beld4Dir.getText() + ls + ls);
